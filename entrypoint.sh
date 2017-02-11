@@ -15,7 +15,7 @@ tar -c -f - -C /usr/src/serendipity . | tar -x -f - -C /var/www/html/$s9yUri
 maxSize=${MAX_SIZE:-10}
 [[ $maxSize -gt 128 ]] && memLimit=$maxSize
 
-cat >/var/www/html/$s9yUri/.htaccess <<-EOF
+cat >>/var/www/html/$s9yUri/.htaccess <<-EOF
 	php_value memory_limit ${memLimit:-128}M
 	php_value upload_max_filesize ${maxSize}M
 	php_value post_max_size ${maxSize}M

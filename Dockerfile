@@ -33,8 +33,15 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/opcache-recommended.ini
 
 # PECL extensions
-RUN pecl install APCu-4.0.11 redis-2.2.8 memcached \
-	&& docker-php-ext-enable apcu redis memcached
+RUN pecl install APCu-4.0.11 redis-3.1.0 memcached xdebug-2.5.0\
+	&& docker-php-ext-enable apcu redis memcached xdebug
+
+RUN { \
+        echo 'xdebug.profiler_enable=0'; \
+        echo 'xdebug.profiler_append=On'; \
+        echo 'xdebug.profiler_output_dir="/var/www/trace";'; \
+        echo 'xdebug.profiler_output_name="cachegrind.out.%t-%s"'; \
+	} > /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN a2enmod rewrite
 
@@ -53,5 +60,8 @@ RUN curl -fsSL -o serendipity-${SERENDIPITY_VERSION}.zip \
 
 COPY ./entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
+
+HEALTHCHECK  --interval=1m --timeout=10s \
+  CMD curl -f http://localhost/ || exit 1
 
 EXPOSE 80
